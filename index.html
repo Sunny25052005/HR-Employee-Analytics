@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HR Employee Analytics Dashboard | Executive BI</title>
+  <!-- Chart.js for interactive visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary: #1E3A8A;
+      --primary-dark: #0F172A;
+      --secondary: #0D9488;
+      --accent-red: #DC2626;
+      --accent-green: #16A34A;
+      --accent-amber: #F59E0B;
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --border: #E2E8F0;
+      --radius: 10px;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Top Navigation Header */
+    header {
+      background: linear-gradient(135deg, var(--primary) 0%, #1e293b 100%);
+      color: white;
+      padding: 16px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-title h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.18);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Tabs Navigation */
+    .nav-tabs {
+      display: flex;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      gap: 8px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      padding: 14px 18px;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    /* Filter Strip */
+    .filter-bar {
+      background: white;
+      padding: 12px 28px;
+      margin: 16px 28px 0;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filter-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .filter-group select {
+      padding: 7px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-main);
+      background: #F8FAFC;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .filter-group select:focus {
+      border-color: var(--primary);
+    }
+
+    .btn-reset {
+      margin-left: auto;
+      padding: 7px 14px;
+      border: 1px solid var(--border);
+      background: white;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-reset:hover {
+      background: #F1F5F9;
+      color: var(--text-main);
+    }
+
+    /* Main Container */
+    main {
+      padding: 20px 28px 40px;
+      flex: 1;
+    }
+
+    /* Tab Contents */
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* KPI Cards Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--surface);
+      padding: 18px 20px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--primary);
+    }
+
+    .kpi-card.teal::before { background: var(--secondary); }
+    .kpi-card.red::before { background: var(--accent-red); }
+    .kpi-card.amber::before { background: var(--accent-amber); }
+
+    .kpi-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .kpi-value {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.1;
+    }
+
+    .kpi-subtext {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* Charts Grid */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 992px) {
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+
+    .chart-card {
+      background: var(--surface);
+      padding: 20px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    .chart-header {
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .chart-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .chart-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 290px;
+      width: 100%;
+    }
+
+    /* Alert Banner */
+    .alert-banner {
+      background: #FEF2F2;
+      border-left: 4px solid var(--accent-red);
+      padding: 14px 18px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .alert-banner h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #991B1B;
+    }
+
+    .alert-banner p {
+      font-size: 12px;
+      color: #7F1D1D;
+      margin-top: 2px;
+    }
+
+    /* Data Table */
+    .table-card {
+      background: white;
+      padding: 20px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    th {
+      background: #F1F5F9;
+      color: var(--text-main);
+      padding: 10px 14px;
+      font-weight: 700;
+      border-bottom: 2px solid var(--border);
+    }
+
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      color: #334155;
+    }
+
+    tr:hover td {
+      background: #F8FAFC;
+    }
+
+    .pill-red {
+      background: #FEE2E2;
+      color: #991B1B;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .pill-green {
+      background: #DCFCE7;
+      color: #166534;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* Links & Buttons */
+    .btn-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: var(--primary);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+
+    .btn-link:hover {
+      background: #1e293b;
+    }
+
+    footer {
+      background: white;
+      border-top: 1px solid var(--border);
+      padding: 16px 28px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="brand-title">
+      <h1>🏢 HR Employee Analytics Dashboard</h1>
+      <span class="badge">Enterprise BI</span>
+      <span class="badge" style="background:#0D9488;">5,000 Records</span>
+    </div>
+    <div style="font-size: 12px; opacity: 0.85;">
+      Python • MySQL • Power BI • DAX
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('overview')">📊 Executive Overview</button>
+    <button class="tab-btn" onclick="switchTab('attrition')">📉 Attrition Dynamics</button>
+    <button class="tab-btn" onclick="switchTab('salary')">💰 Compensation & Equity</button>
+    <button class="tab-btn" onclick="switchTab('performance')">🌟 Performance & Morale</button>
+    <button class="tab-btn" onclick="switchTab('files')">📁 Project Code & SQL</button>
+  </nav>
+
+  <!-- Filter Bar -->
+  <section class="filter-bar">
+    <div class="filter-group">
+      <label>Department</label>
+      <select id="deptFilter" onchange="applyFilters()">
+        <option value="ALL">All Departments (3)</option>
+        <option value="Research & Development">Research & Development</option>
+        <option value="Sales">Sales</option>
+        <option value="Human Resources">Human Resources</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Gender</label>
+      <select id="genderFilter" onchange="applyFilters()">
+        <option value="ALL">All Genders</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Non-Binary">Non-Binary</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Overtime</label>
+      <select id="overtimeFilter" onchange="applyFilters()">
+        <option value="ALL">All Workloads</option>
+        <option value="Yes">Overtime: Yes</option>
+        <option value="No">Overtime: No</option>
+      </select>
+    </div>
+
+    <button class="btn-reset" onclick="resetFilters()">↺ Reset Filters</button>
+  </section>
+
+  <!-- Main Dashboard Canvas -->
+  <main>
+
+    <!-- ========================================== -->
+    <!-- TAB 1: EXECUTIVE OVERVIEW -->
+    <!-- ========================================== -->
+    <section id="tab-overview" class="tab-content active">
+      <!-- KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Total Employees</div>
+          <div class="kpi-value" id="kpiTotalEmp">5,000</div>
+          <div class="kpi-subtext">Cumulative recorded headcount</div>
+        </div>
+        <div class="kpi-card teal">
+          <div class="kpi-label">Active Headcount</div>
+          <div class="kpi-value" id="kpiActiveEmp">4,348</div>
+          <div class="kpi-subtext">86.96% retention rate</div>
+        </div>
+        <div class="kpi-card red">
+          <div class="kpi-label">Attrition Count</div>
+          <div class="kpi-value" id="kpiAttrCount">652</div>
+          <div class="kpi-subtext">Voluntary & separated</div>
+        </div>
+        <div class="kpi-card red">
+          <div class="kpi-label">Attrition Rate</div>
+          <div class="kpi-value" id="kpiAttrRate">13.04%</div>
+          <div class="kpi-subtext">Target threshold: &lt; 12.0%</div>
+        </div>
+        <div class="kpi-card amber">
+          <div class="kpi-label">Avg Monthly Salary</div>
+          <div class="kpi-value" id="kpiAvgSalary">$10,017</div>
+          <div class="kpi-subtext">Median: $8,655</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Avg Employee Age</div>
+          <div class="kpi-value" id="kpiAvgAge">37.0 Yrs</div>
+          <div class="kpi-subtext">Avg Tenure: 3.4 Yrs</div>
+        </div>
+      </div>
+
+      <!-- Charts Grid 1 -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Headcount by Department</div>
+              <div class="chart-subtitle">Workforce distribution across divisions</div>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="chartDept"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Workforce Gender Diversity</div>
+              <div class="chart-subtitle">Gender representation ratio</div>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="chartGender"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Workforce by Age Bracket</div>
+              <div class="chart-subtitle">Generational cohort distribution</div>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="chartAge"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Department Attrition Rate (%)</div>
+              <div class="chart-subtitle">Turnover rate benchmarked across divisions</div>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="chartDeptAttr"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: ATTRITION ANALYSIS -->
+    <!-- ========================================== -->
+    <section id="tab-attrition" class="tab-content">
+      <div class="alert-banner">
+        <div>
+          <h4>⚠️ Critical Finding: Overtime Demands Double Employee Turnover</h4>
+          <p>Employees working Overtime face an attrition rate of <strong>19.71%</strong> compared to <strong>10.38%</strong> for standard workload staff. Junior talent (&lt;25) also experiences <strong>20.69%</strong> attrition.</p>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Attrition Rate by Job Role (%)</div>
+              <div class="chart-subtitle">Sorted by highest risk to lowest</div>
+            </div>
+          </div>
+          <div class="chart-container" style="height: 340px;">
+            <canvas id="chartRoleAttr"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Overtime vs Standard Turnover</div>
+              <div class="chart-subtitle">Attrition comparison by overtime status</div>
+            </div>
+          </div>
+          <div class="chart-container" style="height: 340px;">
+            <canvas id="chartOvertimeAttr"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Attrition by Age Bracket (%)</div>
+              <div class="chart-subtitle">Early-career vs mid-career flight risk</div>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="chartAgeAttr"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Work-Life Balance vs Attrition</div>
+              <div class="chart-subtitle">1: Bad, 2: Good, 3: Better, 4: Best</div>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="chartWlbAttr"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: SALARY AND WORKFORCE -->
+    <!-- ========================================== -->
+    <section id="tab-salary" class="tab-content">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Highest Paid Role</div>
+          <div class="kpi-value" style="font-size: 20px;">Manager</div>
+          <div class="kpi-subtext">Avg: $21,912 / mo</div>
+        </div>
+        <div class="kpi-card teal">
+          <div class="kpi-label">Gender Pay Parity</div>
+          <div class="kpi-value">0.99</div>
+          <div class="kpi-subtext">Equitable compensation</div>
+        </div>
+        <div class="kpi-card amber">
+          <div class="kpi-label">Entry Role Avg</div>
+          <div class="kpi-value" style="font-size: 20px;">$5,179</div>
+          <div class="kpi-subtext">Sales Representative</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Salary Spread</div>
+          <div class="kpi-value" style="font-size: 20px;">$2.2K - $24K</div>
+          <div class="kpi-subtext">Quartile spread verified</div>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card" style="grid-column: span 2;">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Average Monthly Salary by Job Role ($)</div>
+              <div class="chart-subtitle">Compensation hierarchy from executive to entry-level</div>
+            </div>
+          </div>
+          <div class="chart-container" style="height: 340px;">
+            <canvas id="chartRoleSalary"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 4: PERFORMANCE AND SATISFACTION -->
+    <!-- ========================================== -->
+    <section id="tab-performance" class="tab-content">
+      <div class="kpi-grid">
+        <div class="kpi-card red">
+          <div class="kpi-label">Stagnant Promotions</div>
+          <div class="kpi-value">382</div>
+          <div class="kpi-subtext">&gt;= 5 years without promotion</div>
+        </div>
+        <div class="kpi-card teal">
+          <div class="kpi-label">Avg Job Satisfaction</div>
+          <div class="kpi-value">2.71 / 4.0</div>
+          <div class="kpi-subtext">Self-reported sentiment</div>
+        </div>
+        <div class="kpi-card amber">
+          <div class="kpi-label">Work-Life Balance</div>
+          <div class="kpi-value">2.65 / 4.0</div>
+          <div class="kpi-subtext">Company-wide rating</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Avg Appraisal Rating</div>
+          <div class="kpi-value">2.90 / 4.0</div>
+          <div class="kpi-subtext">65% rated Level 3 (Excellent)</div>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Job Satisfaction vs Attrition Rate (%)</div>
+              <div class="chart-subtitle">Turnover declines as employee satisfaction improves</div>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="chartSatAttr"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Departmental Salary Benchmarks ($)</div>
+              <div class="chart-subtitle">Average monthly income by division</div>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="chartDeptSalary"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 5: PROJECT CODE & SQL -->
+    <!-- ========================================== -->
+    <section id="tab-files" class="tab-content">
+      <div class="table-card">
+        <div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="font-size: 16px; font-weight: 700;">📂 Project Source Files & Deliverables</h3>
+          <a class="btn-link" href="dataset/cleaned_employee_data.csv" download>⬇ Download Cleaned Dataset (CSV)</a>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>File Name</th>
+              <th>Category</th>
+              <th>Purpose & Description</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>dataset/cleaned_employee_data.csv</strong></td>
+              <td>Production Data</td>
+              <td>5,000 cleaned, deduplicated, and validated records</td>
+              <td><span class="pill-green">Verified</span></td>
+            </tr>
+            <tr>
+              <td><strong>python/data_cleaning.py</strong></td>
+              <td>Data Pipeline</td>
+              <td>Deduplication, imputation, chronological rules, IQR outliers</td>
+              <td><span class="pill-green">Passed</span></td>
+            </tr>
+            <tr>
+              <td><strong>python/eda_analysis.py</strong></td>
+              <td>Statistical EDA</td>
+              <td>Workforce profiling, turnover cross-tabs, summary metrics</td>
+              <td><span class="pill-green">Passed</span></td>
+            </tr>
+            <tr>
+              <td><strong>python/data_visualization.py</strong></td>
+              <td>Visual Suite</td>
+              <td>Generates 14 high-resolution (300 DPI) corporate charts</td>
+              <td><span class="pill-green">14 Charts</span></td>
+            </tr>
+            <tr>
+              <td><strong>sql/04_business_analysis.sql</strong></td>
+              <td>SQL Analysis</td>
+              <td>15 Core queries answering executive HR business questions</td>
+              <td><span class="pill-green">15 Queries</span></td>
+            </tr>
+            <tr>
+              <td><strong>sql/05_advanced_queries.sql</strong></td>
+              <td>Advanced SQL</td>
+              <td>Window functions (DENSE_RANK, NTILE, CTEs, Joins)</td>
+              <td><span class="pill-green">15 Queries</span></td>
+            </tr>
+            <tr>
+              <td><strong>powerbi/DAX_Measures.md</strong></td>
+              <td>Power BI / DAX</td>
+              <td>21 Explicit DAX measures with filter context definitions</td>
+              <td><span class="pill-green">21 Measures</span></td>
+            </tr>
+            <tr>
+              <td><strong>documentation/business_insights.md</strong></td>
+              <td>Strategy</td>
+              <td>12 In-depth strategic business insights & recommendations</td>
+              <td><span class="pill-green">12 Insights</span></td>
+            </tr>
+            <tr>
+              <td><strong>tests/test_data.py</strong></td>
+              <td>QA Testing</td>
+              <td>14 Automated Pytest validation test cases</td>
+              <td><span class="pill-green">14/14 Passed</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <strong>HR Employee Analytics Dashboard</strong> | Portfolio Project for Data & Business Analyst Roles | Built with Python, MySQL, and Power BI
+  </footer>
+
+  <!-- Dashboard JavaScript with Data & Dynamic Filtering -->
+  <script>
+    // Embedded Data Metrics from Cleaned Dataset (5,000 Records)
+    const rawData = {
+      total: 5000,
+      active: 4348,
+      attrition: 652,
+      attritionRate: 13.04,
+      avgSalary: 10017.48,
+      avgAge: 37.0,
+      departments: { "Research & Development": 3109, "Sales": 1543, "Human Resources": 348 },
+      deptAttrition: { "Research & Development": 13.16, "Sales": 13.09, "Human Resources": 11.78 },
+      deptSalary: { "Research & Development": 10244.83, "Sales": 9547.78, "Human Resources": 10068.97 },
+      genders: { "Male": 2609, "Female": 2189, "Non-Binary": 202 },
+      ageGroups: { "<25": 406, "25-34": 1566, "35-44": 2061, "45-54": 853, "55+": 114 },
+      ageAttrition: { "<25": 20.69, "25-34": 14.69, "35-44": 11.35, "45-54": 10.55, "55+": 12.28 },
+      rolesAttrition: {
+        "Sales Representative": 15.53, "Laboratory Technician": 13.65, "Research Director": 13.50,
+        "Healthcare Representative": 13.44, "Research Scientist": 13.07, "Human Resources": 12.95,
+        "Manufacturing Director": 12.77, "Sales Executive": 12.24, "Manager": 9.66
+      },
+      rolesSalary: {
+        "Manager": 21912.32, "Research Director": 20823.68, "Manufacturing Director": 13335.97,
+        "Healthcare Representative": 13056.94, "Sales Executive": 10313.11, "Research Scientist": 8468.77,
+        "Human Resources": 7077.88, "Laboratory Technician": 5636.23, "Sales Representative": 5179.13
+      },
+      overtimeAttrition: { "No Overtime": 10.38, "Overtime Active": 19.71 },
+      wlbAttrition: { "1 - Bad": 18.85, "2 - Good": 13.49, "3 - Better": 12.10, "4 - Best": 11.07 },
+      satAttrition: { "1 - Low": 16.08, "2 - Medium": 14.38, "3 - High": 11.41, "4 - Very High": 12.23 }
+    };
+
+    // Chart instances storage
+    let charts = {};
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      
+      event.currentTarget.classList.add('active');
+      document.getElementById('tab-' + tabId).classList.add('active');
+    }
+
+    function initCharts() {
+      const navy = '#1E3A8A';
+      const teal = '#0D9488';
+      const red = '#DC2626';
+      const amber = '#F59E0B';
+
+      // 1. Dept Headcount Bar
+      charts.dept = new Chart(document.getElementById('chartDept'), {
+        type: 'bar',
+        data: {
+          labels: Object.keys(rawData.departments),
+          datasets: [{
+            data: Object.values(rawData.departments),
+            backgroundColor: [navy, teal, amber],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+
+      // 2. Gender Donut
+      charts.gender = new Chart(document.getElementById('chartGender'), {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(rawData.genders),
+          datasets: [{
+            data: Object.values(rawData.genders),
+            backgroundColor: [navy, teal, amber],
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom' } },
+          cutout: '65%'
+        }
+      });
+
+      // 3. Age Group Bar
+      charts.age = new Chart(document.getElementById('chartAge'), {
+        type: 'bar',
+        data: {
+          labels: Object.keys(rawData.ageGroups),
+          datasets: [{
+            data: Object.values(rawData.ageGroups),
+            backgroundColor: '#3B82F6',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } }
+        }
+      });
+
+      // 4. Dept Attrition Bar
+      charts.deptAttr = new Chart(document.getElementById('chartDeptAttr'), {
+        type: 'bar',
+        data: {
+          labels: Object.keys(rawData.deptAttrition),
+          datasets: [{
+            data: Object.values(rawData.deptAttrition),
+            backgroundColor: red,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { ticks: { callback: v => v + '%' } } }
+        }
+      });
+
+      // 5. Roles Attrition Horizontal Bar
+      charts.roleAttr = new Chart(document.getElementById('chartRoleAttr'), {
+        type: 'bar',
+        data: {
+          labels: Object.keys(rawData.rolesAttrition),
+          datasets: [{
+            data: Object.values(rawData.rolesAttrition),
+            backgroundColor: red,
+            borderRadius: 4
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { x: { ticks: { callback: v => v + '%' } } }
+        }
+      });
+
+      // 6. Overtime Attrition
+      charts.overtime = new Chart(document.getElementById('chartOvertimeAttr'), {
+        type: 'bar',
+        data: {
+          labels: Object.keys(rawData.overtimeAttrition),
+          datasets: [{
+            data: Object.values(rawData.overtimeAttrition),
+            backgroundColor: [teal, red],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { ticks: { callback: v => v + '%' } } }
+        }
+      });
+
+      // 7. Age Attrition
+      charts.ageAttr = new Chart(document.getElementById('chartAgeAttr'), {
+        type: 'bar',
+        data: {
+          labels: Object.keys(rawData.ageAttrition),
+          datasets: [{
+            data: Object.values(rawData.ageAttrition),
+            backgroundColor: '#EF4444',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { ticks: { callback: v => v + '%' } } }
+        }
+      });
+
+      // 8. Work-Life Balance Attrition
+      charts.wlbAttr = new Chart(document.getElementById('chartWlbAttr'), {
+        type: 'bar',
+        data: {
+          labels: Object.keys(rawData.wlbAttrition),
+          datasets: [{
+            data: Object.values(rawData.wlbAttrition),
+            backgroundColor: [red, amber, '#0284C7', teal],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { ticks: { callback: v => v + '%' } } }
+        }
+      });
+
+      // 9. Roles Salary Horizontal Bar
+      charts.roleSalary = new Chart(document.getElementById('chartRoleSalary'), {
+        type: 'bar',
+        data: {
+          labels: Object.keys(rawData.rolesSalary),
+          datasets: [{
+            data: Object.values(rawData.rolesSalary),
+            backgroundColor: navy,
+            borderRadius: 4
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { x: { ticks: { callback: v => '$' + v.toLocaleString() } } }
+        }
+      });
+
+      // 10. Satisfaction Attrition
+      charts.satAttr = new Chart(document.getElementById('chartSatAttr'), {
+        type: 'bar',
+        data: {
+          labels: Object.keys(rawData.satAttrition),
+          datasets: [{
+            data: Object.values(rawData.satAttrition),
+            backgroundColor: [red, amber, '#0284C7', teal],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { ticks: { callback: v => v + '%' } } }
+        }
+      });
+
+      // 11. Dept Salary Bar
+      charts.deptSalary = new Chart(document.getElementById('chartDeptSalary'), {
+        type: 'bar',
+        data: {
+          labels: Object.keys(rawData.deptSalary),
+          datasets: [{
+            data: Object.values(rawData.deptSalary),
+            backgroundColor: [navy, teal, amber],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { ticks: { callback: v => '$' + v.toLocaleString() } } }
+        }
+      });
+    }
+
+    // Dynamic Slicer Filtering Logic
+    function applyFilters() {
+      const dept = document.getElementById('deptFilter').value;
+      const gender = document.getElementById('genderFilter').value;
+      const ot = document.getElementById('overtimeFilter').value;
+
+      let total = rawData.total;
+      let active = rawData.active;
+      let attr = rawData.attrition;
+      let rate = rawData.attritionRate;
+      let salary = rawData.avgSalary;
+
+      if (dept !== 'ALL') {
+        total = rawData.departments[dept];
+        rate = rawData.deptAttrition[dept];
+        salary = rawData.deptSalary[dept];
+        attr = Math.round(total * (rate / 100));
+        active = total - attr;
+      }
+
+      if (ot === 'Yes') {
+        rate = rawData.overtimeAttrition["Overtime Active"];
+      } else if (ot === 'No') {
+        rate = rawData.overtimeAttrition["No Overtime"];
+      }
+
+      // Update KPI Cards
+      document.getElementById('kpiTotalEmp').innerText = total.toLocaleString();
+      document.getElementById('kpiActiveEmp').innerText = active.toLocaleString();
+      document.getElementById('kpiAttrCount').innerText = attr.toLocaleString();
+      document.getElementById('kpiAttrRate').innerText = rate.toFixed(1) + '%';
+      document.getElementById('kpiAvgSalary').innerText = '$' + Math.round(salary).toLocaleString();
+    }
+
+    function resetFilters() {
+      document.getElementById('deptFilter').value = 'ALL';
+      document.getElementById('genderFilter').value = 'ALL';
+      document.getElementById('overtimeFilter').value = 'ALL';
+      applyFilters();
+    }
+
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', initCharts);
+  </script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+{
+  "total_employees": 5000,
+  "active_employees": 4348,
+  "attrition_count": 652,
+  "attrition_rate": 13.04,
+  "avg_salary": 10017.48,
+  "median_salary": 8655.0,
+  "avg_age": 37.0,
+  "avg_tenure": 3.4,
+  "departments": {
+    "Research & Development": 3109,
+    "Sales": 1543,
+    "Human Resources": 348
+  },
+  "dept_attrition": {
+    "Human Resources": 11.78,
+    "Research & Development": 13.16,
+    "Sales": 13.09
+  },
+  "dept_salary": {
+    "Human Resources": 10068.97,
+    "Research & Development": 10244.83,
+    "Sales": 9547.78
+  },
+  "genders": {
+    "Male": 2609,
+    "Female": 2189,
+    "Non-Binary": 202
+  },
+  "roles_count": {
+    "Research Scientist": 1094,
+    "Laboratory Technician": 901,
+    "Sales Executive": 858,
+    "Sales Representative": 541,
+    "Manufacturing Director": 462,
+    "Manager": 383,
+    "Healthcare Representative": 320,
+    "Human Resources": 278,
+    "Research Director": 163
+  },
+  "roles_attrition": {
+    "Sales Representative": 15.53,
+    "Laboratory Technician": 13.65,
+    "Research Director": 13.5,
+    "Healthcare Representative": 13.44,
+    "Research Scientist": 13.07,
+    "Human Resources": 12.95,
+    "Manufacturing Director": 12.77,
+    "Sales Executive": 12.24,
+    "Manager": 9.66
+  },
+  "roles_salary": {
+    "Manager": 21912.32,
+    "Research Director": 20823.68,
+    "Manufacturing Director": 13335.97,
+    "Healthcare Representative": 13056.94,
+    "Sales Executive": 10313.11,
+    "Research Scientist": 8468.77,
+    "Human Resources": 7077.88,
+    "Laboratory Technician": 5636.23,
+    "Sales Representative": 5179.13
+  },
+  "overtime_attrition": {
+    "No": 10.38,
+    "Yes": 19.71
+  },
+  "overtime_counts": {
+    "No": 3574,
+    "Yes": 1426
+  },
+  "age_group_attrition": {
+    "25-34": 14.69,
+    "35-44": 11.35,
+    "45-54": 10.55,
+    "55+": 12.28,
+    "<25": 20.69
+  },
+  "age_group_counts": {
+    "25-34": 1566,
+    "35-44": 2061,
+    "45-54": 853,
+    "55+": 114,
+    "<25": 406
+  },
+  "satisfaction_attrition": {
+    "1": 16.08,
+    "2": 14.38,
+    "3": 11.41,
+    "4": 12.23
+  },
+  "wlb_attrition": {
+    "1": 18.85,
+    "2": 13.49,
+    "3": 12.1,
+    "4": 11.07
+  },
+  "promo_stagnant_count": 382
+}

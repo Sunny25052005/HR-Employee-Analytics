@@ -1,0 +1,97 @@
+===========================================================================
+HR EMPLOYEE ANALYTICS - COMPREHENSIVE EDA SUMMARY REPORT
+===========================================================================
+
+SECTION 1: KEY PERFORMANCE INDICATORS (ORGANIZATIONAL METRICS)
+  - Total Employee Count      : 5,000
+  - Current Active Headcount  : 4,348 (86.96%)
+  - Total Attrition Count     : 652 (13.04%)
+  - Workforce Retention Rate  : 86.96%
+  - Mean Monthly Income       : $10,017.48
+  - Median Monthly Income     : $8,655.00
+  - Mean Employee Age         : 36.96 Years
+  - Mean Company Tenure       : 3.44 Years
+  - Mean Total Experience     : 10.81 Years
+
+SECTION 2: WORKFORCE DEMOGRAPHIC DISTRIBUTION
+GENDER DISTRIBUTION:
+  - Male        : 2,609 (52.18%)
+  - Female      : 2,189 (43.78%)
+  - Non-Binary  : 202 (4.04%)
+
+DEPARTMENT DISTRIBUTION:
+  - Research & Development   : 3,109 (62.18%)
+  - Sales                    : 1,543 (30.86%)
+  - Human Resources          : 348 (6.96%)
+
+SECTION 3: ATTRITION ANALYSIS BY DEPARTMENT
+                        Total Employees  Attrition Count  Attrition Rate (%)
+Department                                                                  
+Research & Development             3109              409               13.16
+Sales                              1543              202               13.09
+Human Resources                     348               41               11.78
+
+SECTION 4: JOB ROLE PROFILE & COMPENSATION BENCHMARKS
+                           Total_Employees  Attrition_Count  Attrition_Rate  Avg_Monthly_Salary  Median_Salary  Avg_Tenure_Years
+JobRole                                                                                                                         
+Sales Representative                   541               84           15.53             5179.13         5200.0              3.14
+Laboratory Technician                  901              123           13.65             5636.23         5640.0              3.52
+Research Director                      163               22           13.50            20823.68        20780.0              3.82
+Healthcare Representative              320               43           13.44            13056.94        12880.0              3.49
+Research Scientist                    1094              143           13.07             8468.77         8380.0              3.50
+Human Resources                        278               36           12.95             7077.88         6945.0              3.51
+Manufacturing Director                 462               59           12.77            13335.97        13200.0              3.43
+Sales Executive                        858              105           12.24            10313.11        10300.0              3.42
+Manager                                383               37            9.66            21912.32        21580.0              3.30
+
+SECTION 5: OVERTIME WORK ANALYSIS
+          Total_Headcount  Attrition_Count  Attrition_Rate  Avg_Salary
+Overtime                                                              
+No                   3574              371           10.38     9941.86
+Yes                  1426              281           19.71    10207.00
+
+SECTION 6: AGE GROUP ANALYSIS
+          Total_Employees  Attrition_Count  Attrition_Rate  Avg_Salary
+AgeGroup                                                              
+25-34                1566              230           14.69     8541.38
+35-44                2061              234           11.35    10469.43
+45-54                 853               90           10.55    12222.39
+55+                   114               14           12.28    13868.77
+<25                   406               84           20.69     7702.86
+
+SECTION 7: TENURE COHORT ATTRITION PATTERNS
+             Total_Employees  Attrition_Count  Attrition_Rate  Avg_Salary
+TenureGroup                                                              
+0-2 Years               2566              395           15.39     9568.55
+10+ Years                276               33           11.96    11490.07
+3-5 Years               1274              125            9.81    10235.89
+6-10 Years               884               99           11.20    10546.05
+
+SECTION 8: JOB SATISFACTION VS ATTRITION
+                 Total_Employees  Attrition_Count  Attrition_Rate
+JobSatisfaction                                                  
+1                            734              118           16.08
+2                           1245              179           14.38
+3                           1762              201           11.41
+4                           1259              154           12.23
+
+SECTION 9: WORK-LIFE BALANCE IMPACT
+                 Total_Employees  Attrition_Count  Attrition_Rate
+WorkLifeBalance                                                  
+1                            504               95           18.85
+2                           1468              198           13.49
+3                           2305              279           12.10
+4                            723               80           11.07
+
+SECTION 10: PERFORMANCE AND CAREER PROGRESSION
+                   Total_Employees  Avg_Salary  Attrition_Rate
+PerformanceRating                                             
+1                              233     9573.00           14.16
+2                              743    10071.88           12.25
+3                             3283    10010.22           13.25
+4                              741    10134.86           12.55
+Active employees with >= 5 years without promotion: 382
+
+===========================================================================
+END OF EDA SUMMARY REPORT
+===========================================================================
